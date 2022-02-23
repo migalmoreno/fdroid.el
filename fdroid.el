@@ -1,6 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 (require 'consult)
 (require 'embark)
+(require 'cl-lib)
 
 (defgroup fdroid nil
   "Manage F-Droid packages through `fdroidcl'."
@@ -151,7 +152,13 @@ for a MULTIPLE package selection."
 ;;;###autoload
 (defun fdroid-show (package)
   "Shows detailed information about PACKAGE."
-  (interactive))
+  (interactive
+   (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
+  (switch-to-buffer
+   (with-current-buffer (get-buffer-create "*fdroid*")
+     (erase-buffer)
+     (call-process fdroid-program nil t nil "show" package)
+     (current-buffer))))
 
 (embark-define-keymap embark-fdroid-actions
   "Keymap for `fdroidcl' actions which take F-Droid package identifiers."
