@@ -1,0 +1,24 @@
+=fdroid.el= is an Emacs interface to [[https://github.com/mvdan/fdroidcl][fdroidcl]]. Its purpose is to aid the management of F-Droid repository packages to be installed in an Android device from the comfort of Emacs.
+
+To install it, simply put the =fdroid.el= file in your =load-path=, or optionally manually download the source and point to it.
+
+#+begin_src elisp
+(add-to-list 'load-path "path/to/source/fdroid.el")
+#+end_src
+
+This package makes use of the [[https://github.com/oantolin/embark][Embark]] and [[https://github.com/minad/consult][consult]] packages to provide a more coherent interface to the interactive commands, so ensure these are installed too. An example configuration might look like what follows.
+
+#+begin_src elisp
+(global-set-key (kbd "C-c -") #'fdroid-list-packages)
+(with-eval-after-load 'fdroid
+  (custom-set-variables
+   '(fdroid-log-events t) ; Whether messages should be logged after an operation
+   '(fdroid-program (executable-find "fdroidcl")))) ; Path to `fdroidcl'
+#+end_src
+
+In the above configuration, we only set one keybinding because =fdroid-list-packages= shows all packages available for the current F-Droid repository, and from then one can use the following Embark actions on a particular package:
+
+- ~i~ :: install the current package.
+- ~u~ :: uninstall the current package.
+- ~d~ :: download the current package.
+- ~s~ :: show more information about the current package.
