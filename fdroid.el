@@ -19,21 +19,39 @@
   :group 'fdroid
   :type 'boolean)
 
-(cl-defmacro with--fdroidcl (commands &body body)
-  "Executes `fdroidcl' with COMMANDS and performs operations set by BODY."
-  `(with-temp-buffer
-     (apply #'call-process fdroid-program nil t nil ,commands)
+(defvar fdroid--packages nil
+  "Holds the list of cached packages from the current F-Droid repository.")
+
+(cl-defmacro with--fdroidcl (commands message &body body)
+  "Executes `fdroidcl' with COMMANDS and shows MESSAGE after successful completion."
+  `(with-current-buffer (get-buffer-create "*fdroid-output*")
+     (call-process fdroid-program nil t nil "devices")
      (goto-char (point-min))
-     ,@body))
+     (if (re-search-forward (rx (: bol (+ alphanumeric) " - " (+ any))) (point-at-eol) t)
+         (let ((process (make-process
+                         :name "fdroid.el"
+                         :buffer (current-buffer)
+                         :command (list fdroid-program ,@commands)
+                         :sentinel (lambda (p e)
+                                     (if (and (= (process-exit-status p) 0)
+                                              fdroid-log-events)
+                                         (progn
+                                           (cl-typecase ,message
+                                             (cons (apply #'message ,message))
+                                             (t (message ,message)))
+                                           (kill-buffer "*fdroid-output*")))))))
+           ,@body)
+       (user-error "No device connected."))))
 
 (cl-defun fdroid--list-packages (&optional keywords)
   "Lists all packages in current F-Droid repository. Optionally, filter packages by KEYWORDS
  and returns a list of matching results."
   (with--fdroidcl
    (if keywords
-       `("search" ,keywords)
-     '("search"))
-    (let ((results (make-hash-table :test 'equal)))
+       ("search" keywords)
+     ("search"))
+   nil
+   (let ((results (make-hash-table :test 'equal)))
       (while (not (eobp))
         (when (re-search-forward (rx (: bol (group (+ (or alpha punct)))
                                         (+ blank)
@@ -47,7 +65,7 @@
                                      :description (match-string 4))
                    results))
         (forward-line 1))
-      results)))
+      (setf fdroid--packages results))))
 
 (defun fdroid--format-package (key value table)
   "Embellishes package entry with KEY and VALUE from TABLE for user completion."
@@ -64,7 +82,10 @@
   "Builds candidate list with KEYWORDS to be leveraged on completion functions."
   (let ((completion-hash (make-hash-table :test 'equal)))
     (cl-loop for k being the hash-keys
-           in (fdroid--list-packages (or keywords)) using (hash-value v)
+             in (if keywords
+                    (fdroid--list-packages keywords)
+                  (or fdroid--packages (fdroid--list-packages)))
+             using (hash-value v)
            collect (fdroid--format-package k v completion-hash))
     completion-hash))
 
@@ -74,8 +95,8 @@ from the filtered list drawn from KEYWORDS if provided. If specified, prompt the
 for a MULTIPLE package selection."
   (interactive)
   (let ((candidates (if keywords
-                        (fdroid--build-candidate-list)
-                      (fdroid--build-candidate-list keywords))))
+                        (fdroid--build-candidate-list keywords)
+                      (fdroid--build-candidate-list))))
     (if multiple
         (consult-completing-read-multiple
          "Package(s): "
@@ -97,9 +118,8 @@ for a MULTIPLE package selection."
   "Updates current F-Droid repository package index."
   (interactive)
   (with--fdroidcl
-   '("update")
-   (when fdroid-log-events
-     (message "Repository updated!"))))
+   ("update")
+   "Repositories updated."))
 
 ;;;###autoload
 (defun fdroid-search (keywords)
@@ -113,9 +133,8 @@ for a MULTIPLE package selection."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
   (with--fdroidcl
-   `("install" ,package)
-   (when fdroid-log-events
-     (message "Package \"%s\" successfully installed on device." package))))
+   ("install" package)
+   `("Package \"%s\" successfully installed on device." ,package)))
 
 ;;;###autoload
 (defun fdroid-install-multiple (packages)
@@ -124,10 +143,10 @@ for a MULTIPLE package selection."
    (list (mapcar (lambda (e)
                    (gethash e (fdroid--build-candidate-list)))
                  (fdroid--prompt-completion :multiple t))))
-  (with--fdroidcl
-   `("install" ,@packages)
-   (when fdroid-log-events
-     (message "Packages \"%s\" successfully installed on device." (mapconcat #'identity packages " ")))))
+  (let ((packages (mapconcat #'identity packages "")))
+    (with--fdroidcl
+     ("install" packages)
+     `("Packages \"%s\" successfully installed on device." ,packages))))
 
 ;;;###autoload
 (defun fdroid-uninstall (package)
@@ -135,9 +154,8 @@ for a MULTIPLE package selection."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
   (with--fdroidcl
-   `("uninstall" ,package)
-   (when fdroid-log-events
-     (message "Package \"%s\" successfully uninstalled from device." package))))
+   ("uninstall" package)
+   `("Package \"%s\" successfully uninstalled from device." ,package)))
 
 ;;;###autoload
 (defun fdroid-download (package)
@@ -145,15 +163,23 @@ for a MULTIPLE package selection."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
   (with--fdroidcl
-   `("download" ,package)
-   (when fdroid-log-events
-     (message "Package \"%s\" successfully downloaded to device." package))))
+   ("download" package)
+   `("Package \"%s\" successfully downloaded to device." ,package)))
 
 ;;;###autoload
 (defun fdroid-show (package)
   "Shows detailed information about PACKAGE."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
+  ;; TODO: try to use `with--fdroidcl' if possible
+  ;; (with--fdroidcl
+  ;;  ("show" package)
+  ;;  nil
+  ;;  (let ((result (buffer-substring (point-min) (point-max))))
+  ;;    (switch-to-buffer
+  ;;     (with-current-buffer (get-buffer-create "*fdroid*")
+  ;;       (insert result)
+  ;;       (current-buffer)))))
   (switch-to-buffer
    (with-current-buffer (get-buffer-create "*fdroid*")
      (erase-buffer)
