@@ -1,9 +1,17 @@
-=fdroid.el= is an Emacs interface to [[https://github.com/mvdan/fdroidcl][fdroidcl]]. Its purpose is to aid the management of F-Droid repository packages to be installed in an Android device from the comfort of Emacs.
+# -*- mode: org; -*-
+#+title: fdroid.el
+=fdroid.el= is an Emacs interface to [[https://f-droid.org/][F-Droid]]. Its purpose is to aid the management of F-Droid repository packages to be installed in an Android device from the comfort of Emacs.
 
 To install it, simply put the =fdroid.el= file in your =load-path=, or optionally manually download the source and point to it.
 
 #+begin_src elisp
 (add-to-list 'load-path "path/to/source/fdroid.el")
+#+end_src
+
+Alternatively, you can use the [[https://guix.gnu.org/][GNU Guix]] package manager to install the current Git checkout for the package via the provided file =emacs-fdroid.scm=. Simply run the following command in the project's root.
+
+#+begin_src sh
+guix package --install-from-file=./emacs-fdroid.scm
 #+end_src
 
 This package makes use of the [[https://github.com/oantolin/embark][Embark]] and [[https://github.com/minad/consult][consult]] packages to provide a more coherent interface to the interactive commands, so ensure these are installed too. An example configuration might look like what follows.
