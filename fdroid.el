@@ -22,6 +22,10 @@
 (defvar fdroid--packages nil
   "Holds the list of cached packages from the current F-Droid repository.")
 
+
+(defvar fdroid-map nil
+  "Map to bind `fdroid' commands to.")
+
 (cl-defmacro fdroid-with--fdroidcl (commands message &body body)
   "Executes `fdroid-program' with COMMANDS, runs BODY in the context of the result,
 and shows MESSAGE after completion."
@@ -35,7 +39,7 @@ and shows MESSAGE after completion."
                          :buffer (current-buffer)
                          :command (append (list fdroid-program)
                                           ,commands)
-                         :sentinel (lambda (p e)
+                         :sentinel (lambda (p _e)
                                      (cond
                                       ((and (= (process-exit-status p) 0)
                                               fdroid-log-events
@@ -195,6 +199,14 @@ for a MULTIPLE package selection."
   ("d" fdroid-download)
   ("u" fdroid-uninstall)
   ("s" fdroid-show))
+
+(define-prefix-command 'fdroid-map)
+(define-key fdroid-map [?l] #'fdroid-list-packages)
+(define-key fdroid-map [?i] #'fdroid-install)
+(define-key fdroid-map [?d] #'fdroid-download)
+(define-key fdroid-map [?u] #'fdroid-uninstall)
+(define-key fdroid-map [?s] #'fdroid-show)
+(define-key fdroid-map [?I] #'fdroid-install-multiple)
 
 (add-to-list 'embark-keymap-alist '(fdroid . embark-fdroid-actions))
 
