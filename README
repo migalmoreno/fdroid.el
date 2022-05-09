@@ -17,14 +17,14 @@ guix package --install-from-file=./emacs-fdroid.scm
 This package makes use of the [[https://github.com/oantolin/embark][Embark]] and [[https://github.com/minad/consult][consult]] packages to provide a more coherent interface to the interactive commands, so ensure these are installed too. An example configuration might look like what follows.
 
 #+begin_src elisp
-(global-set-key (kbd "C-c -") #'fdroid-list-packages)
+(fdroid-default-keybindings)
 (with-eval-after-load 'fdroid
   (custom-set-variables
    '(fdroid-log-events t) ; Whether messages should be logged after an operation
    '(fdroid-program (executable-find "fdroidcl")))) ; Path to `fdroidcl'
 #+end_src
 
-In the above configuration, we only set one keybinding because =fdroid-list-packages= shows all packages available for the current F-Droid repository, and from then one can use the following Embark actions on a particular package:
+In the above configuration, we set the default keybindings for the =fdroid-map= and from here on we can use the =fdroid-list-packages= (~C-c C-- l~) command to show all packages available for the current F-Droid repository. We can then invoke the following Embark actions on the targets:
 
 - ~i~ :: install the current package.
 - ~u~ :: uninstall the current package.
