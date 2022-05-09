@@ -193,8 +193,17 @@ for a MULTIPLE package selection."
    (let ((result (buffer-substring (point-min) (point-max))))
      (switch-to-buffer
       (with-current-buffer (get-buffer-create "*fdroid-show*")
-        (insert result)
+        (fdroid-output-mode)
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert result))
         (current-buffer))))))
+
+;;;###autoload
+(defun fdroid-default-keybindings ()
+  "Binds the `C-c C-' prefix to `fdroid' actions."
+  (interactive)
+  (global-set-key (kbd "C-c C--") 'fdroid-map))
 
 (embark-define-keymap embark-fdroid-actions
   "Keymap for `fdroid' actions which take F-Droid package identifiers."
@@ -202,6 +211,15 @@ for a MULTIPLE package selection."
   ("d" fdroid-download)
   ("u" fdroid-uninstall)
   ("s" fdroid-show))
+
+(defvar fdroid-output-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [?q] #'kill-this-buffer)
+    map)
+  "Map for *fdroid-show* buffers.")
+
+(define-derived-mode fdroid-output-mode special-mode "F-Droid Output"
+  "Major mode for *fdroid-show* buffers.")
 
 (define-prefix-command 'fdroid-map)
 (define-key fdroid-map [?l] #'fdroid-list-packages)
@@ -214,3 +232,5 @@ for a MULTIPLE package selection."
 (add-to-list 'embark-keymap-alist '(fdroid . embark-fdroid-actions))
 
 (provide 'fdroid)
+
+;;; fdroid.el ends here
