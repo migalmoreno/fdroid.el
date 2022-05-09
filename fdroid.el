@@ -19,9 +19,11 @@
   :group 'fdroid
   :type 'boolean)
 
+(defcustom fdroid-sans-device nil
+  "If non-nil, it indicates `fdroid' commands should override the device connection check.")
+
 (defvar fdroid--packages nil
   "Holds the list of cached packages from the current F-Droid repository.")
-
 
 (defvar fdroid-map nil
   "Map to bind `fdroid' commands to.")
@@ -33,7 +35,8 @@ and shows MESSAGE after completion."
      (erase-buffer)
      (call-process fdroid-program nil t nil "devices")
      (goto-char (point-min))
-     (if (re-search-forward (rx (: bol (+ alphanumeric) " - " (+ any))) (point-at-eol) t)
+     (if (or (re-search-forward (rx (: bol (+ alphanumeric) " - " (+ any))) (point-at-eol) t)
+             fdroid-sans-device)
          (let ((process (make-process
                          :name "fdroid.el"
                          :buffer (current-buffer)
