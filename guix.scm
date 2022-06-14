@@ -30,10 +30,11 @@
     (build-system emacs-build-system)
     (propagated-inputs
      (list emacs-consult emacs-embark))
-    (home-page "https://github.com/efimerspan/fdroid.el")
+    (home-page "https://git.sr.ht/~mt08gh/fdroid.el")
     (synopsis "An Emacs interface to manage F-Droid repositories.")
     (description "fdroid.el is an Emacs interface to fdroidcl. Its purpose is to aid the
  management of F-Droid repository packages to be installed in an Android device from the comfort of Emacs.")
     (license license:gpl3+)))
 
-emacs-fdroid
+(list emacs-fdroid
+      fdroidcl)
