@@ -20,7 +20,9 @@
   :type 'boolean)
 
 (defcustom fdroid-sans-device nil
-  "If non-nil, it indicates `fdroid' commands should override the device connection check.")
+  "If non-nil, it indicates `fdroid' commands should override the device connection check."
+  :group 'fdroid
+  :type 'boolean)
 
 (defvar fdroid--packages nil
   "Holds the list of cached packages from the current F-Droid repository.")
@@ -203,7 +205,7 @@ for a MULTIPLE package selection."
 (defun fdroid-default-keybindings ()
   "Binds the `C-c C-' prefix to `fdroid' actions."
   (interactive)
-  (global-set-key (kbd "C-c C--") 'fdroid-map))
+  (define-key mode-specific-map [?\C--] 'fdroid-map))
 
 (embark-define-keymap embark-fdroid-actions
   "Keymap for `fdroid' actions which take F-Droid package identifiers."
