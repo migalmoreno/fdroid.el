@@ -1,6 +1,4 @@
 ;; -*- lexical-binding: t; -*-
-(require 'consult)
-(require 'embark)
 (require 'cl-lib)
 
 (defgroup fdroid nil
@@ -58,7 +56,7 @@ and shows MESSAGE after completion."
                                          (kill-buffer (process-buffer p)))))))))
            (when (and fdroid-log-events ,message)
              (message "Launching fdroidcl...")))
-       (user-error "No device connected."))))
+       (user-error "No device connected"))))
 
 (defun fdroid--list-packages (&optional keywords)
   "Lists all packages in current F-Droid repository. Optionally, filter packages by KEYWORDS
@@ -115,14 +113,17 @@ for a MULTIPLE package selection."
                         (fdroid--build-candidate-list keywords)
                       (fdroid--build-candidate-list))))
     (if multiple
-        (consult-completing-read-multiple
+        (completing-read-multiple
          "Package(s): "
          candidates)
-      (consult--read
-       candidates
-       :prompt "Package: "
-       :sort nil
-       :category 'fdroid))))
+      (completing-read
+       "Package: "
+       (lambda (string pred action)
+         (if (eq action 'metadata)
+             `(metadata
+               (category . fdroid)
+               (display-sort-function . ,#'identity))
+           (complete-with-action action candidates string pred)))))))
 
 ;;;###autoload
 (defun fdroid-list-packages ()
@@ -207,12 +208,14 @@ for a MULTIPLE package selection."
   (interactive)
   (define-key mode-specific-map [?\C--] 'fdroid-map))
 
-(embark-define-keymap embark-fdroid-actions
-  "Keymap for `fdroid' actions which take F-Droid package identifiers."
-  ("i" fdroid-install)
-  ("d" fdroid-download)
-  ("u" fdroid-uninstall)
-  ("s" fdroid-show))
+(when (require 'embark nil t)
+  (embark-define-keymap embark-fdroid-actions
+    "Keymap for `fdroid' actions which take F-Droid package identifiers."
+    ("i" fdroid-install)
+    ("d" fdroid-download)
+    ("u" fdroid-uninstall)
+    ("s" fdroid-show))
+  (add-to-list 'embark-keymap-alist '(fdroid . embark-fdroid-actions)))
 
 (defvar fdroid-output-mode-map
   (let ((map (make-sparse-keymap)))
@@ -230,8 +233,6 @@ for a MULTIPLE package selection."
 (define-key fdroid-map [?u] #'fdroid-uninstall)
 (define-key fdroid-map [?s] #'fdroid-show)
 (define-key fdroid-map [?I] #'fdroid-install-multiple)
-
-(add-to-list 'embark-keymap-alist '(fdroid . embark-fdroid-actions))
 
 (provide 'fdroid)
 
