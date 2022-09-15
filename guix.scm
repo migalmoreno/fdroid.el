@@ -5,6 +5,7 @@
   #:use-module (guix build-system emacs)
   #:use-module (guix git-download)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages android)
   #:use-module (guix build utils)
   #:use-module (guix gexp)
   #:use-module ((guix licenses) #:prefix license:))
@@ -28,6 +29,8 @@
                  #:recursive? #t
                  #:select? (git-predicate %source-dir)))
     (build-system emacs-build-system)
+    (inputs
+     (list fdroidcl))
     (propagated-inputs
      (list emacs-embark))
     (home-page "https://git.sr.ht/~conses/fdroid.el")
@@ -36,5 +39,4 @@
  management of F-Droid repository packages to be installed in an Android device from the comfort of Emacs.")
     (license license:gpl3+)))
 
-(list emacs-fdroid
-      fdroidcl)
+emacs-fdroid
