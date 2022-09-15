@@ -1,5 +1,13 @@
-;; -*- lexical-binding: t; -*-
+;;; fdroid.el --- An Emacs interface to F-Droid  -*- lexical-binding: t; -*-
+
+;;; Copyright ©2022 conses <contact@conses.eu>
+
+;;; Commentary:
+;; fdroid.el provides a minibuffer-based interface to F-Droid operations.
+
 (require 'cl-lib)
+
+;;; Code:
 
 (defgroup fdroid nil
   "Manage F-Droid packages through `fdroidcl'."
@@ -8,29 +16,29 @@
   :tag "F-Droid")
 
 (defcustom fdroid-program (executable-find "fdroidcl")
-  "Holds the executable path for `fdroidcl'."
+  "The executable path for `fdroidcl'."
   :group 'froid
   :type 'string)
 
 (defcustom fdroid-log-events nil
-  "Selects whether to log the execution of `fdroid-program' events."
+  "Select whether to log the execution of `fdroid-program' events."
   :group 'fdroid
   :type 'boolean)
 
 (defcustom fdroid-sans-device nil
-  "If non-nil, it indicates `fdroid' commands should override the device connection check."
+  "If non-nil, `fdroid' commands should override the device connection check."
   :group 'fdroid
   :type 'boolean)
 
 (defvar fdroid--packages nil
-  "Holds the list of cached packages from the current F-Droid repository.")
+  "The list of cached packages from the current F-Droid repository.")
 
 (defvar fdroid-map nil
   "Map to bind `fdroid' commands to.")
 
 (cl-defmacro fdroid-with--fdroidcl (commands message &body body)
-  "Executes `fdroid-program' with COMMANDS, runs BODY in the context of the result,
-and shows MESSAGE after completion."
+  "Execute `fdroid-program' with COMMANDS.
+Then, run BODY in the context of the result, and show MESSAGE after completion."
   `(with-current-buffer (get-buffer-create "*fdroid-output*")
      (erase-buffer)
      (call-process fdroid-program nil t nil "devices")
@@ -59,8 +67,8 @@ and shows MESSAGE after completion."
        (user-error "No device connected"))))
 
 (defun fdroid--list-packages (&optional keywords)
-  "Lists all packages in current F-Droid repository. Optionally, filter packages by KEYWORDS
- and returns a list of matching results."
+  "List all packages in current F-Droid repository.
+Optionally, filter packages by KEYWORDS and return a list of matching results."
   (let ((command (if keywords (list "search" keywords) (list "search")))
         (results (make-hash-table :test 'equal)))
     (or fdroid--packages
@@ -83,7 +91,7 @@ and shows MESSAGE after completion."
           (setf fdroid--packages results)))))
 
 (defun fdroid--format-package (key value table)
-  "Embellishes package entry with KEY and VALUE from TABLE for user completion."
+  "Embellish package entry with KEY and VALUE from TABLE for user completion."
   (let ((name (cl-getf value :name))
         (version (cl-getf value :version))
         (description (cl-getf value :description)))
@@ -94,7 +102,7 @@ and shows MESSAGE after completion."
                key table))))
 
 (defun fdroid--build-candidate-list (&optional keywords)
-  "Builds candidate list with KEYWORDS to be leveraged on completion functions."
+  "Build candidate list with KEYWORDS to be leveraged on completion functions."
   (let ((completion-hash (make-hash-table :test 'equal)))
     (cl-loop for k being the hash-keys
              in (if keywords
@@ -105,9 +113,9 @@ and shows MESSAGE after completion."
     completion-hash))
 
 (cl-defun fdroid--prompt-completion (&key (multiple nil) (keywords nil))
-  "Prompts the user for a package from the full list of packages, or
-from the filtered list drawn from KEYWORDS if provided. If specified, prompt the user
-for a MULTIPLE package selection."
+  "Prompt the user for a package from the full list of packages.
+Optionally, prompt from the filtered list drawn from KEYWORDS if provided.
+If specified, prompt the user for MULTIPLE package selection."
   (interactive)
   (let ((candidates (if keywords
                         (fdroid--build-candidate-list keywords)
@@ -133,31 +141,31 @@ for a MULTIPLE package selection."
 
 ;;;###autoload
 (defun fdroid-update ()
-  "Clears and updates current F-Droid repository package index."
+  "Clear and update current F-Droid repository package index."
   (interactive)
   (setf fdroid--packages nil)
   (fdroid-with--fdroidcl
    (list "update")
-   "Repositories updated."))
+   "Repositories updated"))
 
 ;;;###autoload
 (defun fdroid-search (keywords)
-  "Searches for packages with KEYWORDS in current F-Droid repository."
+  "Search for packages with KEYWORDS in current F-Droid repository."
   (interactive "sKeywords: ")
   (fdroid--prompt-completion keywords))
 
 ;;;###autoload
 (defun fdroid-install (package)
-  "Installs or upgrades a single PACKAGE on the device."
+  "Install or upgrade a single PACKAGE on the device."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
   (fdroid-with--fdroidcl
    (list "install" package)
-   `("Package \"%s\" successfully installed on device." ,package)))
+   `("Package \"%s\" successfully installed on device" ,package)))
 
 ;;;###autoload
 (defun fdroid-install-multiple (packages)
-  "Installs or upgrades multiple PACKAGES on the device."
+  "Install or upgrade multiple PACKAGES on the device."
   (interactive
    (list (mapcar (lambda (e)
                    (gethash e (fdroid--build-candidate-list)))
@@ -165,29 +173,29 @@ for a MULTIPLE package selection."
   (let ((packages (mapconcat #'identity packages " ")))
     (fdroid-with--fdroidcl
      `("install" ,@(split-string packages))
-     `("Packages \"%s\" successfully installed on device." ,packages))))
+     `("Packages \"%s\" successfully installed on device" ,packages))))
 
 ;;;###autoload
 (defun fdroid-uninstall (package)
-  "Uninstalls PACKAGE from device."
+  "Uninstall PACKAGE from device."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
   (fdroid-with--fdroidcl
    (list "uninstall" package)
-   `("Package \"%s\" successfully uninstalled from device." ,package)))
+   `("Package \"%s\" successfully uninstalled from device" ,package)))
 
 ;;;###autoload
 (defun fdroid-download (package)
-  "Downloads PACKAGE to the device."
+  "Download PACKAGE to the device."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
   (fdroid-with--fdroidcl
    (list "download" package)
-   `("Package \"%s\" successfully downloaded to device." ,package)))
+   `("Package \"%s\" successfully downloaded to device" ,package)))
 
 ;;;###autoload
 (defun fdroid-show (package)
-  "Shows detailed information about PACKAGE."
+  "Show detailed information about PACKAGE."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
   (fdroid-with--fdroidcl
@@ -204,7 +212,7 @@ for a MULTIPLE package selection."
 
 ;;;###autoload
 (defun fdroid-default-keybindings ()
-  "Binds the `C-c C-' prefix to `fdroid' actions."
+  "Bind the `C-c C-' prefix to `fdroid' commands."
   (interactive)
   (define-key mode-specific-map [?\C--] 'fdroid-map))
 
