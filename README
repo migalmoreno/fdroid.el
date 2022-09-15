@@ -13,7 +13,7 @@ If you'd like to contribute to the project, the easiest way is for you to instal
 
 #+begin_src sh
 cd /path/to/fdroid.el
-guix shell --pure
+guix shell -D --pure
 #+end_src
 
 Since this package leverages the [[https://github.com/mvdan/fdroidcl][fdroidcl]] F-Droid desktop client for most of its functionality, it's necessary for you to have it installed. If it's your first time using =fdroidcl=, ensure to download the F-Droid repository index via the =fdroid-update= command.
