@@ -2,12 +2,31 @@
 
 ;;; Copyright ©2022 conses <contact@conses.eu>
 
-;;; Commentary:
-;; fdroid.el provides a minibuffer-based interface to F-Droid operations.
+;; Author: conses <contact@conses.eu>
+;; Version: 0.1.0
+;; Keywords: tools, processes
+;; URL: https://git.sr.ht/~conses/fdroid.el
+;; Package-Requires: ((emacs "25.1") cl-lib)
 
-(require 'cl-lib)
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;; This package provides a minibuffer-based interface to F-Droid.
 
 ;;; Code:
+
+(require 'cl-lib)
 
 (defgroup fdroid nil
   "Manage F-Droid packages through `fdroidcl'."
@@ -243,5 +262,4 @@ If specified, prompt the user for MULTIPLE package selection."
 (define-key fdroid-map [?I] #'fdroid-install-multiple)
 
 (provide 'fdroid)
-
 ;;; fdroid.el ends here
