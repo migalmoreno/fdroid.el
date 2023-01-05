@@ -1,6 +1,6 @@
 ;;; fdroid.el --- An Emacs interface to F-Droid  -*- lexical-binding: t; -*-
 
-;;; Copyright ©2022 conses <contact@conses.eu>
+;; Copyright ©2022 conses <contact@conses.eu>
 
 ;; Author: conses <contact@conses.eu>
 ;; Version: 0.1.0
@@ -62,7 +62,7 @@ Then, run BODY in the context of the result, and show MESSAGE after completion."
      (erase-buffer)
      (call-process fdroid-program nil t nil "devices")
      (goto-char (point-min))
-     (if (or (re-search-forward (rx (: bol (+ alphanumeric) " - " (+ any))) (point-at-eol) t)
+     (if (or (re-search-forward (rx bol (+ alphanumeric) " - " (+ any)) (point-at-eol) t)
              fdroid-sans-device)
          (let ((process (make-process
                          :name "fdroid.el"
@@ -95,11 +95,11 @@ Optionally, filter packages by KEYWORDS and return a list of matching results."
           (apply #'call-process fdroid-program nil t nil command)
           (goto-char (point-min))
           (while (not (eobp))
-            (when (re-search-forward (rx (: bol (group (+ (or alpha punct)))
-                                            (+ blank)
-                                            (or "- " (group (* anychar)))
-                                            " - " (group (+ any))
-                                            "\n" (+ blank) (group (+ any))))
+            (when (re-search-forward (rx bol (group (+ (or alpha punct)))
+                                         (+ blank)
+                                         (or "- " (group (* anychar)))
+                                         " - " (group (+ any))
+                                         "\n" (+ blank) (group (+ any)))
                                      (point-at-eol 2) t)
               (puthash (match-string 1) (list
                                          :name (match-string 2)
