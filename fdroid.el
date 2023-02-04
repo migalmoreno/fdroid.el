@@ -26,7 +26,8 @@
 
 ;;; Code:
 
-(require 'cl-lib)
+(eval-when-compile
+  (require 'cl-lib))
 
 (defgroup fdroid nil
   "Manage F-Droid packages through `fdroidcl'."
@@ -77,27 +78,28 @@ Then, run BODY in the context of the result, and show MESSAGE after completion."
      (erase-buffer)
      (call-process fdroid-program nil t nil "devices")
      (goto-char (point-min))
-     (if (or (re-search-forward (rx bol (+ alphanumeric) " - " (+ any)) (point-at-eol) t)
+     (if (or (re-search-forward
+              (rx bol (+ alphanumeric) " - " (+ any)) (pos-eol) t)
              fdroid-sans-device)
-         (let ((process (make-process
-                         :name "fdroid.el"
-                         :buffer (current-buffer)
-                         :command (append (list fdroid-program)
-                                          ,commands)
-                         :sentinel (lambda (p _e)
-                                     (cond
-                                      ((and (= (process-exit-status p) 0)
-                                              fdroid-log-events
-                                              ,message)
-                                       (cl-typecase ,message
-                                         (cons (apply #'message ,message))
-                                         (t (message ,message))))
-                                      ((= (process-exit-status p) 0)
-                                       (with-current-buffer (process-buffer p)
-                                         ,@body
-                                         (kill-buffer (process-buffer p)))))))))
-           (when (and fdroid-log-events ,message)
-             (message "Launching fdroidcl...")))
+         (make-process
+          :name "fdroid.el"
+          :buffer (current-buffer)
+          :command (append (list fdroid-program)
+                           ,commands)
+          :sentinel (lambda (p _e)
+                      (cond
+                       ((and (= (process-exit-status p) 0)
+                             fdroid-log-events
+                             ,message)
+                        (cl-typecase ,message
+                          (cons (apply #'message ,message))
+                          (t (message ,message))))
+                       ((= (process-exit-status p) 0)
+                        (with-current-buffer (process-buffer p)
+                          ,@body
+                          (kill-buffer (process-buffer p)))))))
+       (when (and fdroid-log-events ,message)
+         (message "Launching fdroidcl..."))
        (user-error "No device connected"))))
 
 (defun fdroid--list-packages (&optional keywords)
@@ -115,7 +117,7 @@ Optionally, filter packages by KEYWORDS and return a list of matching results."
                                          (or "- " (group (* anychar)))
                                          " - " (group (+ any))
                                          "\n" (+ blank) (group (+ any)))
-                                     (point-at-eol 2) t)
+                                     (pos-eol 2) t)
               (puthash (match-string 1) (list
                                          :name (match-string 2)
                                          :version (match-string 3)
