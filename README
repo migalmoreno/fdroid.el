@@ -1,5 +1,5 @@
 # -*- mode: org; org-html-head-include-default-style: nil; org-html-postamble: nil; -*-
-#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil num:nil
 * fdroid.el
 =fdroid.el= is an Emacs interface to [[https://f-droid.org/][F-Droid]]. Its purpose is to aid the management of F-Droid repository packages to be installed in an Android device from the comfort of Emacs.
 
