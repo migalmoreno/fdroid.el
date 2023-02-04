@@ -53,7 +53,22 @@
   "The list of cached packages from the current F-Droid repository.")
 
 (defvar fdroid-map nil
-  "Map to bind `fdroid' commands to.")
+  "Keymap to bind `fdroid' commands to.")
+
+(defvar fdroid-minibuffer-actions
+  (let ((map (make-sparse-keymap)))
+    (define-key map [?i] #'fdroid-install)
+    (define-key map [?d] #'fdroid-download)
+    (define-key map [?u] #'fdroid-uninstall)
+    (define-key map [?s] #'fdroid-show)
+    map)
+  "Keymap for `fdroid' mini-buffer actions.")
+
+(defvar fdroid-output-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [?q] #'kill-this-buffer)
+    map)
+  "Keymap for *fdroid-show* buffers.")
 
 (cl-defmacro fdroid-with--fdroidcl (commands message &body body)
   "Execute `fdroid-program' with COMMANDS.
@@ -235,23 +250,11 @@ If specified, prompt the user for MULTIPLE package selection."
   (interactive)
   (define-key mode-specific-map [?\C--] 'fdroid-map))
 
-(when (require 'embark nil t)
-  (embark-define-keymap embark-fdroid-actions
-    "Keymap for `fdroid' actions which take F-Droid package identifiers."
-    ("i" fdroid-install)
-    ("d" fdroid-download)
-    ("u" fdroid-uninstall)
-    ("s" fdroid-show))
-  (add-to-list 'embark-keymap-alist '(fdroid . embark-fdroid-actions)))
-
-(defvar fdroid-output-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [?q] #'kill-this-buffer)
-    map)
-  "Map for *fdroid-show* buffers.")
-
 (define-derived-mode fdroid-output-mode special-mode "F-Droid Output"
   "Major mode for *fdroid-show* buffers.")
+
+(when (require 'embark nil t)
+  (add-to-list 'embark-keymap-alist '(fdroid . fdroid-minibuffer-actions)))
 
 (define-prefix-command 'fdroid-map)
 (define-key fdroid-map [?l] #'fdroid-list-packages)
