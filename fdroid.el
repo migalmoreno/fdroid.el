@@ -1,12 +1,12 @@
 ;;; fdroid.el --- An Emacs interface to F-Droid  -*- lexical-binding: t; -*-
 
-;; Copyright ©2022 conses <contact@conses.eu>
+;; Copyright © 2022, 2023 conses <contact@conses.eu>
 
 ;; Author: conses <contact@conses.eu>
 ;; Version: 0.1.0
 ;; Keywords: tools, processes
 ;; URL: https://git.sr.ht/~conses/fdroid.el
-;; Package-Requires: ((emacs "25.1") cl-lib)
+;; Package-Requires: ((emacs "25.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
