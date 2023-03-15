@@ -246,11 +246,6 @@ If specified, prompt the user for MULTIPLE package selection."
           (insert result))
         (current-buffer))))))
 
-;;;###autoload
-(defun fdroid-default-keybindings ()
-  "Bind the `C-c C-' prefix to `fdroid' commands."
-  (interactive)
-  (define-key mode-specific-map [?\C--] 'fdroid-map))
 
 (define-derived-mode fdroid-output-mode special-mode "F-Droid Output"
   "Major mode for *fdroid-show* buffers.")
