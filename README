@@ -1,7 +1,7 @@
 # -*- mode: org; org-html-head-include-default-style: nil; org-html-postamble: nil; -*-
 #+OPTIONS: toc:nil num:nil
 * fdroid.el
-=fdroid.el= is an Emacs interface to [[https://f-droid.org/][F-Droid]]. Its purpose is to aid the management of F-Droid repository packages to be installed in an Android device from the comfort of Emacs.
+=fdroid.el= is an Emacs interface to [[https://f-droid.org/][F-Droid]]. Its purpose is to aid in the management of F-Droid packages for an Android device or an emulator inside the comfort of Emacs.
 
 To install it manually, simply point to the =fdroid.el= Git checkout in your =load-path=.
 
@@ -9,7 +9,7 @@ To install it manually, simply point to the =fdroid.el= Git checkout in your =lo
 (add-to-list 'load-path "path/to/fdroid.el")
 #+end_src
 
-If you'd like to contribute to the project, the easiest way is for you to install the [[https://guix.gnu.org/][GNU Guix]] package manager and start developing on it by invoking the following commands:
+If you'd like to contribute to the project, the easiest way is for you to install the [[https://guix.gnu.org/][GNU Guix]] package manager and start developing on the local checkout by invoking the following commands:
 
 #+begin_src sh
 cd /path/to/fdroid.el
