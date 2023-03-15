@@ -50,7 +50,7 @@
   :group 'fdroid
   :type 'boolean)
 
-(defvar fdroid--packages nil
+(defvar fdroid-packages nil
   "The list of cached packages from the current F-Droid repository.")
 
 (defvar fdroid-map nil
@@ -107,7 +107,7 @@ Then, run BODY in the context of the result, and show MESSAGE after completion."
 Optionally, filter packages by KEYWORDS and return a list of matching results."
   (let ((command (if keywords (list "search" keywords) (list "search")))
         (results (make-hash-table :test 'equal)))
-    (or fdroid--packages
+    (or fdroid-packages
         (with-temp-buffer
           (apply #'call-process fdroid-program nil t nil command)
           (goto-char (point-min))
@@ -124,7 +124,7 @@ Optionally, filter packages by KEYWORDS and return a list of matching results."
                                          :description (match-string 4))
                        results))
             (forward-line 1))
-          (setf fdroid--packages results)))))
+          (setq fdroid-packages results)))))
 
 (defun fdroid--format-package (key value table)
   "Embellish package entry with KEY and VALUE from TABLE for user completion."
@@ -179,10 +179,10 @@ If specified, prompt the user for MULTIPLE package selection."
 (defun fdroid-update ()
   "Clear and update current F-Droid repository package index."
   (interactive)
-  (setf fdroid--packages nil)
   (fdroid-with--fdroidcl
    (list "update")
    "Repositories updated"))
+  (setq fdroid-packages nil)
 
 ;;;###autoload
 (defun fdroid-search (keywords)
