@@ -45,6 +45,18 @@
   :group 'fdroid
   :type 'boolean)
 
+(defcustom fdroid-package-format "%a [%v]: %d"
+  "The format for each entry in the list of F-Droid packages.
+
+The following %-escapes will be expanded using `format-spec':
+
+%n      The package name.
+%v      The package version.
+%a      The package appid.
+%d      The package description."
+  :type 'string
+  :group 'fdroid)
+
 (defcustom fdroid-sans-device nil
   "If non-nil, `fdroid' commands should override the device connection check."
   :group 'fdroid
@@ -128,14 +140,14 @@ Optionally, filter packages by KEYWORDS and return a list of matching results."
 
 (defun fdroid--format-package (key value table)
   "Embellish package entry with KEY and VALUE from TABLE for user completion."
-  (let ((name (cl-getf value :name))
-        (version (cl-getf value :version))
-        (description (cl-getf value :description)))
-    (if (not (string-empty-p name))
-        (puthash (format "%s - %s (%s): %s" name version key description)
-                 key table)
-      (puthash (format "%s - %s: %s" key version description)
-               key table))))
+  (let* ((name (cl-getf value :name))
+         (version (cl-getf value :version))
+         (description (cl-getf value :description))
+         (spec `((?n . ,name)
+                 (?v . ,version)
+                 (?a . ,key)
+                 (?d . ,description))))
+    (puthash (format-spec fdroid-package-format spec) key table)))
 
 (defun fdroid--build-candidate-list (&optional keywords)
   "Build candidate list with KEYWORDS to be leveraged on completion functions."
