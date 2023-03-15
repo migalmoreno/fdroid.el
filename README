@@ -21,14 +21,13 @@ Since this package leverages the [[https://github.com/mvdan/fdroidcl][fdroidcl]]
 An example configuration might look like this:
 
 #+begin_src elisp
-(fdroid-default-keybindings)
+(define-key global-map (kbd "C-c C--") 'fdroid-map) ; Set your preferred binding for the fdroid-map
 (with-eval-after-load 'fdroid
-  (custom-set-variables
-   '(fdroid-log-events t) ; Whether messages should be logged after an operation
-   '(fdroid-sans-device t))) ; Perform `fdroid-*' operations without a connected device
+  (setopt fdroid-log-events t) ; Whether messages should be logged after an operation
+  (setopt fdroid-sans-device t)) ; Perform `fdroid-*' operations without a connected device
 #+end_src
 
-Above, we set the default keybindings for the =fdroid-map=, meaning from here on we can use the =fdroid-list-packages= (~C-c C-- l~) command to show all packages available for the current F-Droid repository. You can then invoke the interactive commands set below or, if you have the [[https://github.com/oantolin/embark][Embark]] package installed, the corresponding Embark actions on the mini-buffer targets:
+Above, we set a global binding for the =fdroid-map=. From here onward we can use the =fdroid-list-packages= command to show all packages available for the current F-Droid repository. You can then invoke the interactive commands set below or, if you have the [[https://github.com/oantolin/embark][Embark]] package installed, the corresponding Embark actions on the mini-buffer targets:
 
 - =fdroid-install= (~i~) :: install the current package.
 - =fdroid-uninstall= (~u~) :: uninstall the current package.
