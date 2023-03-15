@@ -83,39 +83,32 @@ The following %-escapes will be expanded using `format-spec':
     map)
   "Keymap for *fdroid-show* buffers.")
 
-(cl-defmacro fdroid-with--fdroidcl (commands message &body body)
+(defun fdroid--call-fdroidcl (message &rest commands)
   "Execute `fdroid-program' with COMMANDS.
-Then, run BODY in the context of the result, and show MESSAGE after completion."
-  `(with-current-buffer (get-buffer-create "*fdroid-output*")
-     (erase-buffer)
-     (call-process fdroid-program nil t nil "devices")
-     (goto-char (point-min))
-     (if (or (re-search-forward
-              (rx bol (+ alphanumeric) " - " (+ any)) (pos-eol) t)
-             fdroid-sans-device)
-         (make-process
-          :name "fdroid.el"
-          :buffer (current-buffer)
-          :command (append (list fdroid-program)
-                           ,commands)
-          :sentinel (lambda (p _e)
-                      (cond
-                       ((and (= (process-exit-status p) 0)
-                             fdroid-log-events
-                             ,message)
-                        (cl-typecase ,message
-                          (cons (apply #'message ,message))
-                          (t (message ,message))))
-                       ((= (process-exit-status p) 0)
-                        (with-current-buffer (process-buffer p)
-                          ,@body
-                          (kill-buffer (process-buffer p)))))))
-       (when (and fdroid-log-events ,message)
-         (message "Launching fdroidcl..."))
-       (user-error "No device connected"))))
+Show MESSAGE after command completion."
+  (with-current-buffer (get-buffer-create "*fdroid-output*")
+    (erase-buffer)
+    (call-process fdroid-program nil t nil "devices")
+    (goto-char (point-min))
+    (if (or (re-search-forward
+             (rx bol (+ alphanumeric) " - " (+ any)) (pos-eol) t)
+            fdroid-sans-device)
+        (progn
+          (when fdroid-log-events
+            (message "Launching fdroidcl..."))
+          (make-process
+           :name "fdroid.el"
+           :buffer (current-buffer)
+           :command (append (list fdroid-program) commands)
+           :sentinel (lambda (p _e)
+                       (when (and (= (process-exit-status p) 0)
+                                  fdroid-log-events
+                                  message)
+                         (message message)))))
+      (user-error "No device connected"))))
 
 (defun fdroid--list-packages (&optional keywords)
-  "List all packages in current F-Droid repository.
+  "List all packages in the enabled F-Droid repositories.
 Optionally, filter packages by KEYWORDS and return a list of matching results."
   (let ((command (if keywords (list "search" keywords) (list "search")))
         (results (make-hash-table :test 'equal)))
@@ -191,10 +184,8 @@ If specified, prompt the user for MULTIPLE package selection."
 (defun fdroid-update ()
   "Clear and update current F-Droid repository package index."
   (interactive)
-  (fdroid-with--fdroidcl
-   (list "update")
-   "Repositories updated"))
   (setq fdroid-packages nil)
+  (fdroid--call-fdroidcl "Repositories updated" "update"))
 
 ;;;###autoload
 (defun fdroid-search (keywords)
@@ -207,9 +198,9 @@ If specified, prompt the user for MULTIPLE package selection."
   "Install or upgrade a single PACKAGE on the device."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
-  (fdroid-with--fdroidcl
-   (list "install" package)
-   `("Package \"%s\" successfully installed on device" ,package)))
+  (fdroid--call-fdroidcl
+   (format "Package %S successfully installed on device" package)
+   "install" package))
 
 ;;;###autoload
 (defun fdroid-install-multiple (packages)
@@ -218,46 +209,47 @@ If specified, prompt the user for MULTIPLE package selection."
    (list (mapcar (lambda (e)
                    (gethash e (fdroid--build-candidate-list)))
                  (fdroid--prompt-completion :multiple t))))
-  (let ((packages (mapconcat #'identity packages " ")))
-    (fdroid-with--fdroidcl
-     `("install" ,@(split-string packages))
-     `("Packages \"%s\" successfully installed on device" ,packages))))
+  (let ((names (mapconcat #'identity packages " ")))
+    (apply #'fdroid--call-fdroidcl
+           (format "Packages %S successfully installed on device" names)
+           "install" packages)))
 
 ;;;###autoload
 (defun fdroid-uninstall (package)
   "Uninstall PACKAGE from device."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
-  (fdroid-with--fdroidcl
-   (list "uninstall" package)
-   `("Package \"%s\" successfully uninstalled from device" ,package)))
+  (fdroid--call-fdroidcl
+   (format "Package %S successfully uninstalled from device" package)
+   "uninstall" package))
 
 ;;;###autoload
 (defun fdroid-download (package)
   "Download PACKAGE to the device."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
-  (fdroid-with--fdroidcl
-   (list "download" package)
-   `("Package \"%s\" successfully downloaded to device" ,package)))
+  (fdroid--call-fdroidcl
+   (format "Package %S successfully downloaded to device" package)
+   "download" package))
 
 ;;;###autoload
 (defun fdroid-show (package)
   "Show detailed information about PACKAGE."
   (interactive
    (list (gethash (fdroid--prompt-completion) (fdroid--build-candidate-list))))
-  (fdroid-with--fdroidcl
-   (list "show" package)
-   nil
-   (let ((result (buffer-substring (point-min) (point-max))))
-     (switch-to-buffer
-      (with-current-buffer (get-buffer-create "*fdroid-show*")
-        (fdroid-output-mode)
-        (let ((inhibit-read-only t))
-          (erase-buffer)
-          (insert result))
-        (current-buffer))))))
-
+  (set-process-sentinel
+   (fdroid--call-fdroidcl nil "show" package)
+   (lambda (p _e)
+     (when (= (process-exit-status p) 0)
+       (let ((result (with-current-buffer (process-buffer p)
+                       (buffer-substring (point-min) (point-max)))))
+         (switch-to-buffer
+          (with-current-buffer (get-buffer-create "*fdroid-show*")
+            (fdroid-output-mode)
+            (let ((inhibit-read-only t))
+              (erase-buffer)
+              (insert result))
+            (current-buffer))))))))
 
 (define-derived-mode fdroid-output-mode special-mode "F-Droid Output"
   "Major mode for *fdroid-show* buffers.")
