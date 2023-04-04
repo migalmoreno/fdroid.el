@@ -34,4 +34,4 @@ Above, we set a global binding for the =fdroid-map=. From here onward we can use
 - =fdroid-download= (~d~) :: download the current package.
 - =fdroid-show= (~s~) :: show more information about the current package.
 
-You can use the project's [[https://lists.sr.ht/~conses/fdroid.el][mailing list]] to send feedback, patches or open discussions. Bugs should be reported on the project's [[https://todo.sr.ht/~conses/fdroid.el][bug-tracker]].
+You can use the project's [[https://lists.sr.ht/~mmoreno/fdroid.el][mailing list]] to send feedback, patches or open discussions. Bugs should be reported on the project's [[https://todo.sr.ht/~mmoreno/fdroid.el][bug-tracker]].
