@@ -29,5 +29,5 @@ Above, we set a global binding for the `fdroid-map`. From here onward we can use
 -   **`fdroid-download` (`d`):** download the current package.
 -   **`fdroid-show` (`s`):** show more information about the current package.
 
-You can send feedback, patches, or bug reports to [public@mianmoreno.com](mailto:public@mianmoreno.com).  
+Feel free to open an issue or send a pull request if you encounter a bug or wish to add a new feature.  
 
