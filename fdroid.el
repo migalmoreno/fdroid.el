@@ -247,6 +247,7 @@ If specified, prompt the user for MULTIPLE package selection."
             (let ((inhibit-read-only t))
               (erase-buffer)
               (insert result))
+            (goto-char (point-min))
             (current-buffer))))))))
 
 (define-derived-mode fdroid-output-mode special-mode "F-Droid Output"
