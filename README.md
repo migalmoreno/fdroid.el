@@ -8,7 +8,7 @@ To install it manually, simply point to the `fdroid.el` Git checkout in your `lo
 
     (add-to-list 'load-path "path/to/fdroid.el")
 
-If you'd like to contribute to the project, the easiest way is for you to install the [GNU Guix](https://guix.gnu.org/) package manager and start developing on the local checkout by invoking the following commands:  
+If you'd like to contribute to the package and get the project set up quickly, I suggest you install the [GNU Guix](https://guix.gnu.org/) package manager and start developing on the local checkout by invoking the following commands:  
 
     cd /path/to/fdroid.el
     guix shell --pure
@@ -17,10 +17,10 @@ Since this package leverages the [fdroidcl](https://github.com/mvdan/fdroidcl) F
 
 An example configuration might look like this:  
 
-    (define-key global-map (kbd "C-c C--") 'fdroid-map) ; Set your preferred binding for the fdroid-map
+    (define-key global-map (kbd "C-c f") 'fdroid-map) ; Set your preferred binding for the fdroid-map
     (with-eval-after-load 'fdroid
-      (setopt fdroid-log-events t) ; Whether messages should be logged after an operation
-      (setopt fdroid-sans-device t)) ; Perform `fdroid-*' operations without a connected device
+      (setq fdroid-log-events t) ; Whether messages should be logged after an operation
+      (setq fdroid-sans-device t)) ; Perform `fdroid-*' operations without a connected device
 
 Above, we set a global binding for the `fdroid-map`. From here onward we can use the `fdroid-list-packages` command to show all packages available for the current F-Droid repository. You can then invoke the interactive commands set below or, if you have the [Embark](https://github.com/oantolin/embark) package installed, the corresponding Embark actions on the mini-buffer targets:  
 
