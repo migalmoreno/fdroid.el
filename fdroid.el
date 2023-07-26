@@ -3,7 +3,7 @@
 ;; Copyright © 2022, 2023 Miguel Ángel Moreno <mail@migalmoreno.com>
 
 ;; Author: Miguel Ángel Moreno <mail@migalmoreno.com>
-;; Version: 0.1.0
+;; Version: 0.1.1
 ;; Keywords: tools, processes
 ;; URL: https://github.com/migalmoreno/fdroid.el
 ;; Package-Requires: ((emacs "25.1"))
