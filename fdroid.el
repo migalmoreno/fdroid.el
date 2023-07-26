@@ -26,7 +26,7 @@
 
 ;;; Code:
 
-(eval-when-compile
+(eval-and-compile
   (require 'cl-lib))
 
 (defgroup fdroid nil
@@ -254,7 +254,7 @@ If specified, prompt the user for MULTIPLE package selection."
 (define-derived-mode fdroid-output-mode special-mode "F-Droid Output"
   "Major mode for *fdroid-show* buffers.")
 
-(when (require 'embark nil t)
+(when (eval-when-compile (require 'embark nil t))
   (add-to-list 'embark-keymap-alist '(fdroid . fdroid-minibuffer-actions)))
 
 (define-prefix-command 'fdroid-map)
