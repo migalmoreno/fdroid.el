@@ -41,7 +41,7 @@
   :type 'string)
 
 (defcustom fdroid-log-events nil
-  "Select whether to log the execution of `fdroid-program' events."
+  "When non-nil, log the execution of `fdroid-program' events."
   :group 'fdroid
   :type 'boolean)
 
