@@ -77,12 +77,6 @@ The following %-escapes will be expanded using `format-spec':
     map)
   "Keymap for `fdroid' mini-buffer actions.")
 
-(defvar fdroid-output-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [?q] #'kill-this-buffer)
-    map)
-  "Keymap for *fdroid-show* buffers.")
-
 (defun fdroid--call-fdroidcl (message &rest commands)
   "Execute `fdroid-program' with COMMANDS.
 Show MESSAGE after command completion."
