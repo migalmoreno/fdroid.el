@@ -95,10 +95,14 @@ Show MESSAGE after command completion."
            :buffer (current-buffer)
            :command (append (list fdroid-program) commands)
            :sentinel (lambda (p _e)
-                       (when (and (= (process-exit-status p) 0)
-                                  fdroid-log-events
-                                  message)
-                         (message message)))))
+                       (cond
+                        ((/= (process-exit-status p) 0)
+                         (message
+                          "fdroidcl exited: ensure your device is connected"))
+                        ((and (= (process-exit-status p) 0)
+                              fdroid-log-events
+                              message)
+                         (message message))))))
       (user-error "No device connected"))))
 
 (defun fdroid--list-packages (&optional keywords)
