@@ -1,4 +1,4 @@
-# -*- mode: org; org-html-head-include-default-style: nil; org-html-postamble: nil; after-save-hook: org-md-export-to-markdown; -*-
+# -*- mode: org; org-html-head-include-default-style: nil; org-html-postamble: nil; -*-
 #+OPTIONS: toc:nil num:nil
 * fdroid.el
 =fdroid.el= is an Emacs interface to [[https://f-droid.org/][F-Droid]]. Its purpose is to aid in the management of F-Droid packages for an Android device or an emulator inside the comfort of Emacs.
@@ -33,5 +33,3 @@ Above, we set a global binding for the =fdroid-map=. From here onward we can use
 - =fdroid-uninstall= (~u~) :: uninstall the current package.
 - =fdroid-download= (~d~) :: download the current package.
 - =fdroid-show= (~s~) :: show more information about the current package.
-
-Feel free to open an issue or send a pull request if you encounter a bug or wish to add a new feature.
