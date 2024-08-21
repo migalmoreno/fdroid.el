@@ -1,14 +1,13 @@
-(define-module (emacs-fdroid)
-  #:use-module (gnu packages android)
-  #:use-module (gnu packages emacs-xyz)
-  #:use-module (guix build utils)
-  #:use-module (guix build-system emacs)
-  #:use-module (guix gexp)
-  #:use-module (guix git-download)
-  #:use-module ((guix licenses) #:prefix license:)
-  #:use-module (guix packages)
-  #:use-module (ice-9 popen)
-  #:use-module (ice-9 rdelim))
+(use-modules (gnu packages android)
+             (gnu packages emacs-xyz)
+             (guix build utils)
+             (guix build-system emacs)
+             (guix gexp)
+             (guix git-download)
+             ((guix licenses) #:prefix license:)
+             (guix packages)
+             (ice-9 popen)
+             (ice-9 rdelim))
 
 (define %source-dir (dirname (current-filename)))
 
@@ -33,7 +32,7 @@
      (list fdroidcl))
     (propagated-inputs
      (list emacs-embark))
-    (home-page "https://git.sr.ht/~conses/fdroid.el")
+    (home-page "https://git.migalmoreno.com/fdroid.el")
     (synopsis "An Emacs interface to manage F-Droid repositories")
     (description "fdroid.el is an Emacs interface to fdroidcl.  Its purpose
 is to aid the management of F-Droid packages from the comfort of Emacs.")

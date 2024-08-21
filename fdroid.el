@@ -5,7 +5,7 @@
 ;; Author: Miguel Ángel Moreno <mail@migalmoreno.com>
 ;; Version: 0.1.1
 ;; Keywords: tools, processes
-;; URL: https://github.com/migalmoreno/fdroid.el
+;; URL: https://git.migalmoreno.com/fdroid.el
 ;; Package-Requires: ((emacs "25.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -148,7 +148,7 @@ Optionally, filter packages by KEYWORDS and return a list of matching results."
                     (fdroid--list-packages keywords)
                   (fdroid--list-packages))
              using (hash-value v)
-           collect (fdroid--format-package k v completion-hash))
+             collect (fdroid--format-package k v completion-hash))
     completion-hash))
 
 (cl-defun fdroid--prompt-completion (&key (multiple nil) (keywords nil))
