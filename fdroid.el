@@ -57,8 +57,8 @@ The following %-escapes will be expanded using `format-spec':
   :type 'string
   :group 'fdroid)
 
-(defcustom fdroid-sans-device nil
-  "If non-nil, `fdroid' commands should override the device connection check."
+(defcustom fdroid-device-check-p nil
+  "If non-nil, `fdroid' commands should enforce a device connection check."
   :group 'fdroid
   :type 'boolean)
 
@@ -83,11 +83,12 @@ The following %-escapes will be expanded using `format-spec':
 Show MESSAGE after command completion."
   (with-current-buffer (get-buffer-create "*fdroid-output*")
     (erase-buffer)
-    (call-process fdroid-program nil t nil "devices")
+    (when fdroid-device-check-p
+      (call-process fdroid-program nil t nil "devices"))
     (goto-char (point-min))
-    (if (or (re-search-forward
-             (rx bol (+ alphanumeric) " - " (+ any)) (pos-eol) t)
-            fdroid-sans-device)
+    (if (or (not fdroid-device-check-p)
+            (re-search-forward
+             (rx bol (+ alphanumeric) " - " (+ any)) (pos-eol) t))
         (progn
           (when fdroid-log-events
             (message "Launching fdroidcl..."))
