@@ -40,7 +40,7 @@
   :group 'froid
   :type 'string)
 
-(defcustom fdroid-log-events nil
+(defcustom fdroid-log-events t
   "When non-nil, log the execution of `fdroid-program' events."
   :group 'fdroid
   :type 'boolean)
