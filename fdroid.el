@@ -65,6 +65,7 @@ The following %-escapes will be expanded using `format-spec':
 (defvar fdroid-packages nil
   "The list of cached packages from the current F-Droid repository.")
 
+;;;###autoload (autoload 'fdroid-map "fdroid" "Map to bind `fdroid' commands to." nil 'keymap)
 (defvar fdroid-map nil
   "Keymap to bind `fdroid' commands to.")
 
