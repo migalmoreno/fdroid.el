@@ -255,7 +255,7 @@ If specified, prompt the user for MULTIPLE package selection."
 (define-derived-mode fdroid-output-mode special-mode "F-Droid Output"
   "Major mode for *fdroid-show* buffers.")
 
-(when (eval-when-compile (require 'embark nil t))
+(when (eval-and-compile (require 'embark nil t))
   (add-to-list 'embark-keymap-alist '(fdroid . fdroid-minibuffer-actions)))
 
 (define-prefix-command 'fdroid-map)
