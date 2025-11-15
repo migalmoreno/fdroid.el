@@ -33,10 +33,10 @@ An example =fdroid.el= configuration might look like this:
 (define-key global-map (kbd "C-c f") 'fdroid-map)
 (with-eval-after-load 'fdroid
   (setq fdroid-log-events t)
-  (setq fdroid-sans-device t))
+  (setq fdroid-device-check-p t))
 #+end_src
 
-Above, we set a global binding for the =fdroid-map= and modify a couple of settings which control the verbosity of =fdroidcl= commands and whether we can run commands without a connected device.
+Above, we set a global binding for the =fdroid-map= and modify a couple of settings which control the verbosity of =fdroidcl= commands and whether we want to enforce a device connection check for =fdroid-*= commands.
 
 To show all packages available in the current F-Droid repositories you can run the =fdroid-list-packages= command. You can then invoke the interactive commands set below or, if you have the [[https://github.com/oantolin/embark][Embark]] package installed, the corresponding Embark actions on the mini-buffer targets:
 
